@@ -1,14 +1,11 @@
 import json
-from datetime import datetime
-from collections import defaultdict
 import logging
-from typing import List, Dict, Any
+from collections import defaultdict
+from datetime import datetime
+from typing import Any, Dict, List
 
 # Настройка логирования
-logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 
 def analyze_categories(data, year, month):
@@ -22,22 +19,21 @@ def analyze_categories(data, year, month):
     """
     try:
         # Фильтрация транзакций по указанному периоду
-        filtered_data = list(filter(
-            lambda x: datetime.strptime(x['date'], '%Y-%m-%d').year == year
-                      and datetime.strptime(x['date'], '%Y-%m-%d').month == month,
-            data
-        ))
+        filtered_data = list(
+            filter(
+                lambda x: datetime.strptime(x["date"], "%Y-%m-%d").year == year
+                and datetime.strptime(x["date"], "%Y-%m-%d").month == month,
+                data,
+            )
+        )
 
         # Группировка по категориям и суммирование сумм
         category_sums = defaultdict(int)
         for transaction in filtered_data:
-            category_sums[transaction['category']] += transaction['amount']
+            category_sums[transaction["category"]] += transaction["amount"]
 
         # Преобразование в JSON
-        result = {
-            category: round(amount * 0.01, 2)  # 1% кешбэка
-            for category, amount in category_sums.items()
-        }
+        result = {category: round(amount * 0.01, 2) for category, amount in category_sums.items()}  # 1% кешбэка
 
         logging.info(f"Анализ категорий за {year}-{month} выполнен успешно")
         return json.dumps(result)
@@ -49,6 +45,7 @@ def analyze_categories(data, year, month):
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 # Инвесткопилка
 def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) -> float:
@@ -62,15 +59,15 @@ def investment_bank(month: str, transactions: List[Dict[str, Any]], limit: int) 
     """
     try:
         total_savings = 0.0
-        year, month_num = map(int, month.split('-'))
+        year, month_num = map(int, month.split("-"))
 
         for transaction in transactions:
-            date_str = transaction.get('Дата операции', '')
-            amount = transaction.get('Сумма операции', 0)
+            date_str = transaction.get("Дата операции", "")
+            amount = transaction.get("Сумма операции", 0)
 
             # Проверяем, что транзакция относится к нужному месяцу
             try:
-                date = datetime.strptime(date_str, '%Y-%m-%d')
+                date = datetime.strptime(date_str, "%Y-%m-%d")
                 if date.year != year or date.month != month_num:
                     continue
             except ValueError:

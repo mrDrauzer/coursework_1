@@ -1,7 +1,8 @@
 # import os
-from dotenv import load_dotenv
-from src.utils import open_json
 import requests
+from dotenv import load_dotenv
+
+from src.utils import open_json
 
 
 def sum_transaction(local_json_file, coin="RUB") -> float:

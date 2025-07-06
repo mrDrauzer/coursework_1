@@ -1,6 +1,5 @@
-import os
 import logging
-
+import os
 
 logger_card_number = logging.getLogger("get_mask_card_number")
 logger_card_number.setLevel(logging.DEBUG)

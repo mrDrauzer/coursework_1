@@ -1,12 +1,14 @@
-import os
 import datetime
 import json
-import requests
 import logging
-from typing import List, Dict, Any
-from dotenv import load_dotenv
+import os
+from typing import Any, Dict, List
+
 import pandas as pd
-from utils import fetch_data_from_api, process_dataframe, generate_json_response
+import requests
+from dotenv import load_dotenv
+
+from utils import fetch_data_from_api, generate_json_response, process_dataframe
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -44,11 +46,7 @@ def get_card_data(cards: List[Dict]) -> List[Dict]:
             last_digits = card["number"][-4:]
             total_spent = sum(t["amount"] for t in card["transactions"])
             cashback = round(total_spent / 100, 2)  # 1% кешбэка
-            result.append({
-                "last_digits": last_digits,
-                "total_spent": round(total_spent, 2),
-                "cashback": cashback
-            })
+            result.append({"last_digits": last_digits, "total_spent": round(total_spent, 2), "cashback": cashback})
         except KeyError as e:
             logger.error(f"Ошибка в данных карты: {e}")
     return result
@@ -72,13 +70,11 @@ def get_currency_rates() -> List[Dict]:
         data = response.json()
         return [
             {"currency": "USD", "rate": round(data["Valute"]["USD"]["Value"], 2)},
-            {"currency": "EUR", "rate": round(data["Valute"]["EUR"]["Value"], 2)}
+            {"currency": "EUR", "rate": round(data["Valute"]["EUR"]["Value"], 2)},
         ]
     except Exception as e:
         logger.error(f"Ошибка при запросе курсов: {e}")
-        return [  # Резервные данные
-            {"currency": "USD", "rate": 83.21},
-            {"currency": "EUR", "rate": 97.08}        ]
+        return [{"currency": "USD", "rate": 83.21}, {"currency": "EUR", "rate": 97.08}]  # Резервные данные
 
 
 # --- 5. Акции S&P500 (Alpha Vantage) ---
@@ -112,24 +108,21 @@ def get_backup_stock_data() -> List[Dict]:
         {"stock": "AMZN", "price": 3250.10},
         {"stock": "GOOGL", "price": 2742.39},
         {"stock": "MSFT", "price": 296.71},
-        {"stock": "TSLA", "price": 1007.08}
+        {"stock": "TSLA", "price": 1007.08},
     ]
 
 
 # --- Главная функция ---
-def generate_report(
-        time_str: str,
-        cards_data: List[Dict],
-        transactions: List[Dict]
-) -> Dict[str, Any]:
+def generate_report(time_str: str, cards_data: List[Dict], transactions: List[Dict]) -> Dict[str, Any]:
     """Генерирует итоговый JSON-отчёт."""
     return {
         "greeting": get_greeting(time_str),
         "cards": get_card_data(cards_data),
         "top_transactions": get_top_transactions(transactions),
         "currency_rates": get_currency_rates(),
-        "stock_prices": get_stock_prices()
+        "stock_prices": get_stock_prices(),
     }
+
 
 # ---Функция для страницы «События»
 def events_page_handler(input_df: pd.DataFrame) -> str:

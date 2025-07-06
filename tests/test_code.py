@@ -1,17 +1,20 @@
 # import os
+from functools import wraps
+from unittest.mock import patch
+
 import pytest
+
+from src.decorators import log
+from src.external_api import sum_transaction
+from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
+from src.masks import get_mask_account, get_mask_card_number
+from src.processing import filter_by_state, sort_by_date
+from src.utils import open_json
+from src.widget import get_date, mask_account_card
+
 # import pandas as pd
 # import logging
 
-from unittest.mock import patch
-from functools import wraps
-from src.masks import get_mask_account, get_mask_card_number
-from src.widget import mask_account_card, get_date
-from src.processing import filter_by_state, sort_by_date
-from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
-from src.decorators import log
-from src.utils import open_json
-from src.external_api import sum_transaction
 
 # from unittest.mock import patch
 # from StringIO import StringIO

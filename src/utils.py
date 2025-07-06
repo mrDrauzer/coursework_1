@@ -1,12 +1,12 @@
-import json
 import datetime
-import os
+import json
 import logging
-import pandas as pd
+import os
 import re
 from json import JSONDecodeError
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
+import pandas as pd
 
 # Настройка логирования
 logger = logging.getLogger("utils")
@@ -42,7 +42,7 @@ def open_csv(local_csv_file=os.path.join(os.path.dirname(__file__), "..", "data"
             print(f"Файл {local_csv_file} не найден")
             return "[]"
         else:
-            wine_reviews = pd.read_csv(local_csv_file, delimiter=';')
+            wine_reviews = pd.read_csv(local_csv_file, delimiter=";")
             print(wine_reviews.shape)
             return wine_reviews.to_dict("records")
     except csv.Error as e:
@@ -82,6 +82,7 @@ def fetch_data_from_api(api_url: str) -> Dict[str, Any]:
         logger.error(f"Ошибка при запросе к API: {e}")
         return {}
 
+
 def process_dataframe(df: pd.DataFrame) -> List[Dict[str, Any]]:
     """Обрабатывает DataFrame и преобразует в список словарей."""
     try:
@@ -93,14 +94,11 @@ def process_dataframe(df: pd.DataFrame) -> List[Dict[str, Any]]:
         logger.error(f"Ошибка обработки DataFrame: {e}")
         return []
 
+
 def generate_json_response(data: List[Dict[str, Any]]) -> str:
     """Генерирует JSON-ответ."""
     try:
-        response = {
-            "status": "success",
-            "timestamp": datetime.datetime.now().isoformat(),
-            "data": data
-        }
+        response = {"status": "success", "timestamp": datetime.datetime.now().isoformat(), "data": data}
         return json.dumps(response, ensure_ascii=False, indent=4)
     except Exception as e:
         logger.error(f"Ошибка генерации JSON: {e}")
@@ -109,9 +107,7 @@ def generate_json_response(data: List[Dict[str, Any]]) -> str:
 
 # --- Функции поиска ---
 def search_transactions(
-        transactions: List[Dict[str, Any]],
-        query: str,
-        case_sensitive: bool = False
+    transactions: List[Dict[str, Any]], query: str, case_sensitive: bool = False
 ) -> List[Dict[str, Any]]:
     """
     Ищет транзакции по строке в описании или категории.
@@ -128,9 +124,9 @@ def search_transactions(
         pattern = re.compile(re.escape(query), flags)
 
         result = [
-            t for t in transactions
-            if pattern.search(str(t.get("Описание", "")))
-               or pattern.search(str(t.get("Категория", "")))
+            t
+            for t in transactions
+            if pattern.search(str(t.get("Описание", ""))) or pattern.search(str(t.get("Категория", "")))
         ]
         logger.info(f"Найдено {len(result)} транзакций по запросу '{query}'")
         return result
@@ -140,8 +136,7 @@ def search_transactions(
 
 
 def find_phone_transactions(
-        transactions: List[Dict[str, Any]],
-        phone_pattern: Optional[str] = None
+    transactions: List[Dict[str, Any]], phone_pattern: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
     Ищет транзакции с номерами телефонов в описании.
@@ -150,13 +145,10 @@ def find_phone_transactions(
     >>> find_phone_transactions([{"Описание": "Пополнение +7 921 123-45-67"}])
     [{"Описание": "Пополнение +7 921 123-45-67"}]
     """
-    default_pattern = r'(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}'
+    default_pattern = r"(\+7|8)[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}"
     try:
         regex = re.compile(phone_pattern or default_pattern)
-        result = [
-            t for t in transactions
-            if regex.search(str(t.get("Описание", "")))
-        ]
+        result = [t for t in transactions if regex.search(str(t.get("Описание", "")))]
         logger.info(f"Найдено {len(result)} транзакций с номерами телефонов")
         return result
     except Exception as e:
@@ -165,8 +157,7 @@ def find_phone_transactions(
 
 
 def find_person_transfers(
-        transactions: List[Dict[str, Any]],
-        name_pattern: Optional[str] = None
+    transactions: List[Dict[str, Any]], name_pattern: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
     Ищет переводы физлицам (шаблон: 'Имя Ф.' + категория 'Переводы').
@@ -175,13 +166,13 @@ def find_person_transfers(
     >>> find_person_transfers([{"Описание": "Иван П.", "Категория": "Переводы"}])
     [{"Описание": "Иван П.", "Категория": "Переводы"}]
     """
-    default_pattern = r'^[А-ЯЁ][а-яё]+\s[А-ЯЁ]\.$'
+    default_pattern = r"^[А-ЯЁ][а-яё]+\s[А-ЯЁ]\.$"
     try:
         regex = re.compile(name_pattern or default_pattern)
         result = [
-            t for t in transactions
-            if str(t.get("Категория", "")).lower() == "переводы"
-               and regex.search(str(t.get("Описание", "")))
+            t
+            for t in transactions
+            if str(t.get("Категория", "")).lower() == "переводы" and regex.search(str(t.get("Описание", "")))
         ]
         logger.info(f"Найдено {len(result)} переводов физлицам")
         return result
