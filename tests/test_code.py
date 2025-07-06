@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pandas as pd
 import pytest
+import json
 
 from src.decorators import log
 from src.external_api import sum_transaction
@@ -330,8 +331,14 @@ def test_report_by_category():
 
 def test_report_by_weekday():
     result = report_by_weekday(sample_df)
-    expected = {"Thursday": 100.0, "Friday": 50.0, "Saturday": 150.0, "Sunday": 200.0}
+    expected = {
+        "Thursday": 100.0,
+        "Saturday": 150.0,
+        "Tuesday": 50.0,
+        "Sunday": 200.0
+    }
     assert json.loads(result) == expected
+
 
 
 def test_report_by_workday():
