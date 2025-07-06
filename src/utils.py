@@ -8,6 +8,9 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
+log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
+os.makedirs(log_dir, exist_ok=True)
+
 # Настройка логирования
 logger = logging.getLogger("utils")
 logger.setLevel(logging.DEBUG)

@@ -2,6 +2,7 @@
 from functools import wraps
 from unittest.mock import patch
 
+import pandas as pd
 import pytest
 
 from src.decorators import log
@@ -9,8 +10,16 @@ from src.external_api import sum_transaction
 from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 from src.masks import get_mask_account, get_mask_card_number
 from src.processing import filter_by_state, sort_by_date
+from src.reports import report_by_category, report_by_weekday, report_by_workday
 from src.utils import open_json
 from src.widget import get_date, mask_account_card
+
+sample_data = {
+    "category": ["Продукты", "Продукты", "Транспорт", "Продукты"],
+    "date": ["2025-04-10", "2025-05-10", "2025-04-15", "2025-06-01"],
+    "amount": [100.0, 150.0, 50.0, 200.0],
+}
+sample_df = pd.DataFrame(sample_data)
 
 # import pandas as pd
 # import logging
