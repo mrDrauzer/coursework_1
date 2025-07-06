@@ -224,16 +224,8 @@ def test_log_output(capsys):
         return
 
     my_function_2()
-
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            captured = capsys.readouterr()
-            assert captured.out == f"Calling function {func.__name__} with args {args} and kwargs {kwargs}\n"
-
-        return wrapper
-
-    return decorator
+    captured = capsys.readouterr()
+    assert captured.out == "Calling function my_function_2 with args () and kwargs {}\n"
 
 
 def test_log_file(capsys):
@@ -318,4 +310,4 @@ def test_sum_transaction():
 @patch("requests.get")
 def test_sum_transaction_requests(mock_get):
     mock_get.return_value.json.return_vale = {"Valute": {"USD": {"Value": 99.018}}}
-    assert sum_transaction(r"c:\python\project\home_work\data\operations.json") == 4974829.120000002
+    assert sum_transaction(r"data\operations.json") == 4974829.120000002
