@@ -311,3 +311,27 @@ def test_sum_transaction():
 def test_sum_transaction_requests(mock_get):
     mock_get.return_value.json.return_vale = {"Valute": {"USD": {"Value": 99.018}}}
     assert sum_transaction(r"data\operations.json") == 4974829.120000002
+
+
+def test_report_by_category():
+    result = report_by_category(sample_df, "Продукты", "2025-04-07")
+    expected = {"category": "Продукты", "period_start": "2025-04-07", "period_end": "2025-07-06", "total": 450.0}
+    assert json.loads(result) == expected
+
+
+def test_report_by_weekday():
+    result = report_by_weekday(sample_df)
+    expected = {"Thursday": 100.0, "Friday": 50.0, "Saturday": 150.0, "Sunday": 200.0}
+    assert json.loads(result) == expected
+
+
+def test_report_by_workday():
+    result = report_by_workday(sample_df, "Продукты", "2025-04-07")
+    expected = {
+        "category": "Продукты",
+        "period_start": "2025-04-07",
+        "period_end": "2025-07-06",
+        "workday_total": 100.0,
+        "weekend_total": 350.0,
+    }
+    assert json.loads(result) == expected
