@@ -1,6 +1,6 @@
 import re
 from collections import Counter
-
+import pandas as pd
 from src.processing import filter_by_state, sort_by_date
 from src.utils import open_csv, open_excel, open_json
 
@@ -164,6 +164,31 @@ def main():
 
         # Вывод результата
         if not list_transac:
+            print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
+
+            # --- Показываем отчёты за последние 2 недели по всем данным ---
+            df_all = pd.DataFrame()  # создаём пустой DataFrame
+            if "category" in df_all.columns and "amount" in df_all.columns and "date" in df_all.columns:
+                # Фильтр по дате: последние 2 недели
+                df_all['date'] = pd.to_datetime(df_all['date'])
+                date_from = (datetime.now() - timedelta(days=14)).strftime("%Y-%m-%d")
+                df_recent = df_all[df_all['date'] >= date_from]
+
+                if not df_recent.empty:
+                    print("\nСводные отчёты за последние 2 недели по всем данным:")
+
+                    print("\nОтчёт: траты по категории (Продукты):")
+                    print(report_by_category(df_recent, "Продукты", date_from))
+
+                    print("\nОтчёт: траты по дням недели:")
+                    print(report_by_weekday(df_recent, date_from))
+
+                    print("\nОтчёт: траты в рабочий/выходной день (Продукты):")
+                    print(report_by_workday(df_recent, "Продукты", date_from))
+                else:
+                    print("\nНет транзакций за последние 2 недели для формирования отчётов.")
+            else:
+                print("\nДанные не содержат нужных столбцов ('category', 'amount', 'date') для формирования отчётов.")
             print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
         else:
             for transaction in list_transac:
